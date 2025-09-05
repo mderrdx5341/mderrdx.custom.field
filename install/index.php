@@ -31,6 +31,13 @@ class mderrdx_custom_field extends CModule
     {
         //TODO: нужное заменить
         return [
+		    [
+                "module" =>"iblock",
+                "event" => "OnIBlockPropertyBuildList",
+                "this_module" => $this->MODULE_ID,
+                "class_name" => "\Mderrdx\Custom\Field\CustomFieldJsonSave",
+                "method_name" =>  "getTypeDescription"
+            ],
             [
                 "module" =>"main",
                 "event" => "OnUserTypeBuildList",

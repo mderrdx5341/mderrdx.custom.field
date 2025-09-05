@@ -3,6 +3,18 @@ namespace Mderrdx\Custom\Field;
 
 class CustomFieldJsonSave extends \Bitrix\Main\UserField\Types\BaseType
 {
+	public static function getTypeDescription() {
+        return [
+            'PROPERTY_TYPE' => \CUserTypeManager::BASE_TYPE_STRING,
+            'USER_TYPE' => 'custom_type_element_field_string',
+            'DESCRIPTION' => 'Пример создания поля',
+            'GetPropertyFieldHtml' => [__CLASS__, 'GetPropertyFieldHtml'],
+			'ConvertToDB' => [__CLASS__, 'ConvertToDB'],
+			'ConvertFromDB' => [__CLASS__, 'ConvertFromDB'],
+            //'GetSettingsHTML' => [__CLASS__, 'GetSettingsHTML'],
+        ];
+    }
+	
 
 	public static function getDescription(): array
 	{
@@ -12,11 +24,6 @@ class CustomFieldJsonSave extends \Bitrix\Main\UserField\Types\BaseType
 			'DESCRIPTION' => "Пример создания поля",
 			'BASE_TYPE' => \CUserTypeManager::BASE_TYPE_STRING,
 		];
-	}
-
-	public static function onAfterFetch(array $userField, array $fetched)
-	{
-		return json_decode($fetched['VALUE'], true);
 	}
 
 	static function GetDBColumnType(): string
@@ -56,6 +63,12 @@ class CustomFieldJsonSave extends \Bitrix\Main\UserField\Types\BaseType
 		return $r;
 
     }
+	
+	public static function onAfterFetch(array $userField, array $fetched)
+	{
+		return json_decode($fetched['VALUE'], true);
+	}
+
 
 	public static function onBeforeSave(?array $userField, $value)
 	{
@@ -63,5 +76,37 @@ class CustomFieldJsonSave extends \Bitrix\Main\UserField\Types\BaseType
 			return null;
 		}
 		return json_encode($value);
+	}
+	
+	
+	/////iblock
+	
+	public static function GetPropertyFieldHtml($arProperty, $value, $strHTMLControlName)
+	{
+		//self::getProducts();
+		$html = '';
+		if (is_array($value['VALUE'])) {
+		$html = 'Товар:<input name="'. $strHTMLControlName["VALUE"] . '[tag]"'. 'value="'.$value['VALUE']['tag'] . '"></input>'
+				.'Количество:<input name="'. $strHTMLControlName["VALUE"] . '[link]"'. 'value="' . $value['VALUE']['link'] . '"></input>';
+		} else {
+			$html = 'Товар:<input name="'. $strHTMLControlName["VALUE"] . '[tag]" value=""></input>'
+				.'Количество:<input name="'. $strHTMLControlName["VALUE"] . '[link]" value=""></input>';
+		}
+		return $html;
+	}
+	
+	
+	public static function ConvertToDB($arProperty, $value)
+	{
+		if ($value['VALUE']['tag'] === '' && $value['VALUE']['link'] === '') {
+
+			return false;
+		}
+		return json_encode($value);
+	}
+
+	public static function ConvertFromDB($arProperty, $value, $format = '')
+	{
+		return json_decode($value['VALUE'], true);
 	}
 }
